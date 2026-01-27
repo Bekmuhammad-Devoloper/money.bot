@@ -44,13 +44,10 @@ import { NotificationSchedulerService } from './scheduler';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const token = configService.get<string>('telegram.botToken') || '';
-        console.log('Telegram Bot Token:', token ? 'Set' : 'NOT SET');
+        console.log('Telegram Bot Token:', token ? `Set (${token.substring(0, 10)}...)` : 'NOT SET');
         return {
           token,
-          launchOptions: {
-            polling: true,
-            dropPendingUpdates: true,
-          },
+          launchOptions: {},
         };
       },
     }),
