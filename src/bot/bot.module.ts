@@ -48,6 +48,7 @@ import { NotificationSchedulerService } from './scheduler';
         return {
           token,
           launchOptions: {
+            webhook: false, // Use polling instead of webhook
             dropPendingUpdates: true,
             allowedUpdates: ['message', 'callback_query'],
           },
