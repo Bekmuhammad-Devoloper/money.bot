@@ -43,10 +43,12 @@ import { NotificationSchedulerService } from './scheduler';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        const token = configService.get<string>('telegram.botToken') || '';
+        console.log('Telegram Bot Token:', token ? 'Set' : 'NOT SET');
         return {
-          token: configService.get<string>('telegram.botToken') || '',
+          token,
           launchOptions: {
-            // Always use long polling (works on any port)
+            polling: true,
             dropPendingUpdates: true,
           },
         };
