@@ -47,7 +47,10 @@ import { NotificationSchedulerService } from './scheduler';
         console.log('Telegram Bot Token:', token ? `Set (${token.substring(0, 10)}...)` : 'NOT SET');
         return {
           token,
-          launchOptions: {},
+          launchOptions: {
+            dropPendingUpdates: true,
+            allowedUpdates: ['message', 'callback_query'],
+          },
         };
       },
     }),
