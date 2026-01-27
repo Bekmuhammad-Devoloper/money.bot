@@ -39,10 +39,16 @@ export class AdminUpdateHandler {
   @Command('admin')
   async onAdminCommand(@Ctx() ctx: BotContext) {
     const telegramId = ctx.from?.id;
-    this.logger.log(`/admin command from user ${telegramId}`);
+    this.logger.log(`/admin command from user ${telegramId}, adminIds: ${this.adminIds.join(', ')}`);
 
-    if (!telegramId || !this.isAdmin(telegramId)) {
-      this.logger.log(`User ${telegramId} is NOT admin`);
+    if (!telegramId) {
+      await ctx.reply('❌ Foydalanuvchi aniqlanmadi');
+      return;
+    }
+
+    if (!this.isAdmin(telegramId)) {
+      this.logger.log(`User ${telegramId} is NOT admin. Admin IDs: ${this.adminIds}`);
+      await ctx.reply(`❌ Siz admin emassiz.\n\nSizning ID: ${telegramId}`);
       return;
     }
 
