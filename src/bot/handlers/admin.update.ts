@@ -33,25 +33,34 @@ export class AdminUpdateHandler implements OnModuleInit {
    * Register /admin command directly on bot instance
    */
   onModuleInit() {
-    this.bot.command('admin', async (ctx) => {
-      const telegramId = ctx.from?.id;
-      this.logger.log(`/admin command from user ${telegramId}`);
+    try {
+      this.bot.command('admin', async (ctx) => {
+        try {
+          const telegramId = ctx.from?.id;
+          this.logger.log(`/admin command from user ${telegramId}`);
 
-      if (!telegramId) {
-        await ctx.reply('❌ Foydalanuvchi aniqlanmadi');
-        return;
-      }
+          if (!telegramId) {
+            await ctx.reply('❌ Foydalanuvchi aniqlanmadi');
+            return;
+          }
 
-      if (!this.isAdmin(telegramId)) {
-        this.logger.log(`User ${telegramId} is NOT admin`);
-        await ctx.reply(`❌ Siz admin emassiz.\n\nSizning ID: ${telegramId}`);
-        return;
-      }
+          if (!this.isAdmin(telegramId)) {
+            this.logger.log(`User ${telegramId} is NOT admin`);
+            await ctx.reply(`❌ Siz admin emassiz.\n\nSizning ID: ${telegramId}`);
+            return;
+          }
 
-      await this.showAdminMenu(ctx);
-    });
-    
-    this.logger.log('Admin /admin command registered');
+          await this.showAdminMenu(ctx);
+        } catch (error) {
+          this.logger.error(`Error in /admin command: ${error}`);
+          await ctx.reply('❌ Xatolik yuz berdi');
+        }
+      });
+      
+      this.logger.log('Admin /admin command registered');
+    } catch (error) {
+      this.logger.error(`Failed to register /admin command: ${error}`);
+    }
   }
 
   private isAdmin(telegramId: number): boolean {
