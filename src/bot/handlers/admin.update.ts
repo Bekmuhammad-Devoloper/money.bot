@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectBot, Update, Ctx, Hears, Action } from 'nestjs-telegraf';
+import { InjectBot, Update, Ctx, Hears, Action, On } from 'nestjs-telegraf';
 import { Telegraf, Context, Markup } from 'telegraf';
 import { Message } from 'telegraf/typings/core/types/typegram';
 import { InjectRepository } from '@nestjs/typeorm';
