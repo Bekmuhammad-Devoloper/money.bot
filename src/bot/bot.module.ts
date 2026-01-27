@@ -60,9 +60,9 @@ import { NotificationSchedulerService } from './scheduler';
     ExcelService,
     BroadcastService,
     
-    // Handlers
-    UserUpdateHandler,
+    // Handlers - AdminUpdateHandler MUST be first to register /admin command before @On('text')
     AdminUpdateHandler,
+    UserUpdateHandler,
     
     // Scheduler
     NotificationSchedulerService,

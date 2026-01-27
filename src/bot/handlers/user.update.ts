@@ -99,8 +99,11 @@ export class UserUpdateHandler {
 
     if (!telegramId || !text) return;
 
-    // Skip /admin command - let admin handler process it
-    if (text === '/admin') return;
+    // Skip all commands starting with / - let command handlers process them
+    if (text.startsWith('/')) {
+      this.logger.log(`Skipping command: ${text}`);
+      return;
+    }
 
     try {
       // Check for cancel
