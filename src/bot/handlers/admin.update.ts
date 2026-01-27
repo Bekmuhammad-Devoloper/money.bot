@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectBot, Update, Ctx, Command, On, Action } from 'nestjs-telegraf';
+import { InjectBot, Update, Ctx, Hears, Action } from 'nestjs-telegraf';
 import { Telegraf, Context, Markup } from 'telegraf';
 import { Message } from 'telegraf/typings/core/types/typegram';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,7 +11,7 @@ interface BotContext extends Context {}
 
 @Update()
 @Injectable()
-export class AdminUpdateHandler {
+export class AdminUpdateHandler implements OnModuleInit {
   private readonly logger = new Logger(AdminUpdateHandler.name);
   private readonly adminIds: number[];
   
@@ -29,30 +29,33 @@ export class AdminUpdateHandler {
     this.logger.log(`Admin IDs loaded: ${this.adminIds.join(', ')}`);
   }
 
-  private isAdmin(telegramId: number): boolean {
-    return this.adminIds.includes(telegramId);
+  /**
+   * Register /admin command directly on bot instance
+   */
+  onModuleInit() {
+    this.bot.command('admin', async (ctx) => {
+      const telegramId = ctx.from?.id;
+      this.logger.log(`/admin command from user ${telegramId}`);
+
+      if (!telegramId) {
+        await ctx.reply('❌ Foydalanuvchi aniqlanmadi');
+        return;
+      }
+
+      if (!this.isAdmin(telegramId)) {
+        this.logger.log(`User ${telegramId} is NOT admin`);
+        await ctx.reply(`❌ Siz admin emassiz.\n\nSizning ID: ${telegramId}`);
+        return;
+      }
+
+      await this.showAdminMenu(ctx);
+    });
+    
+    this.logger.log('Admin /admin command registered');
   }
 
-  /**
-   * /admin command handler
-   */
-  @Command('admin')
-  async onAdminCommand(@Ctx() ctx: BotContext) {
-    const telegramId = ctx.from?.id;
-    this.logger.log(`/admin command from user ${telegramId}, adminIds: ${this.adminIds.join(', ')}`);
-
-    if (!telegramId) {
-      await ctx.reply('❌ Foydalanuvchi aniqlanmadi');
-      return;
-    }
-
-    if (!this.isAdmin(telegramId)) {
-      this.logger.log(`User ${telegramId} is NOT admin. Admin IDs: ${this.adminIds}`);
-      await ctx.reply(`❌ Siz admin emassiz.\n\nSizning ID: ${telegramId}`);
-      return;
-    }
-
-    await this.showAdminMenu(ctx);
+  private isAdmin(telegramId: number): boolean {
+    return this.adminIds.includes(telegramId);
   }
 
   /**
