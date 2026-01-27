@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: puloqimi_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password_here
+      POSTGRES_DB: puloqimi_bot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - puloqimi_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: puloqimi_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - puloqimi_network
+    command: redis-server --appendonly yes
+
+  # NestJS Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: puloqimi_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - puloqimi_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  puloqimi_network:
+    driver: bridge
