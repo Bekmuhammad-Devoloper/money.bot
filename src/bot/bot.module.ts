@@ -43,19 +43,12 @@ import { NotificationSchedulerService } from './scheduler';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get<string>('app.nodeEnv') === 'production';
-        const webhookDomain = configService.get<string>('app.url');
-        
         return {
           token: configService.get<string>('telegram.botToken') || '',
-          launchOptions: isProduction && webhookDomain
-            ? {
-                webhook: {
-                  domain: webhookDomain,
-                  hookPath: '/telegram-webhook',
-                },
-              }
-            : {},
+          launchOptions: {
+            // Always use long polling (works on any port)
+            dropPendingUpdates: true,
+          },
         };
       },
     }),
