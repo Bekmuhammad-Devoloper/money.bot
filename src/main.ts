@@ -36,16 +36,26 @@ async function bootstrap() {
   // Start the application
   await app.listen(port);
 
-  // Manually launch the bot with polling
+  logger.log(`🚀 Application is running on: http://localhost:${port}`);
+  logger.log(`📍 Environment: ${nodeEnv}`);
+
+  // Manually launch the bot with polling (non-blocking)
   try {
     const bot = app.get<Telegraf>(getBotToken());
-    await bot.launch({
+    
+    // Log bot info first
+    const botInfo = await bot.telegram.getMe();
+    logger.log(`🤖 Bot info: @${botInfo.username} (${botInfo.id})`);
+    
+    bot.launch({
       dropPendingUpdates: true,
       allowedUpdates: ['message', 'callback_query'],
+    }).then(() => {
+      logger.log(`🤖 Bot polling stopped`);
+    }).catch((err: any) => {
+      logger.error(`❌ Bot polling error: ${err?.message || err}`);
     });
 
-    logger.log(`🚀 Application is running on: http://localhost:${port}`);
-    logger.log(`📍 Environment: ${nodeEnv}`);
     logger.log(`🤖 Bot is ready and listening for updates!`);
 
     // Graceful shutdown
