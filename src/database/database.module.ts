@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   User,
   Channel,
+  Plan,
   Subscription,
   Payment,
   Notification,
@@ -22,8 +23,8 @@ import {
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        entities: [User, Channel, Subscription, Payment, Notification, Broadcast],
-        synchronize: configService.get<string>('app.nodeEnv') === 'development',
+        entities: [User, Channel, Plan, Subscription, Payment, Notification, Broadcast],
+        synchronize: true,
         logging: configService.get<string>('app.nodeEnv') === 'development',
         autoLoadEntities: true,
       }),
@@ -31,6 +32,7 @@ import {
     TypeOrmModule.forFeature([
       User,
       Channel,
+      Plan,
       Subscription,
       Payment,
       Notification,

@@ -37,26 +37,31 @@ async function bootstrap() {
   await app.listen(port);
 
   // Manually launch the bot with polling
-  const bot = app.get<Telegraf>(getBotToken());
-  await bot.launch({
-    dropPendingUpdates: true,
-    allowedUpdates: ['message', 'callback_query'],
-  });
-
-  logger.log(`🚀 Application is running on: http://localhost:${port}`);
-  logger.log(`📍 Environment: ${nodeEnv}`);
-  logger.log(`🤖 Bot is ready and listening for updates!`);
-
-  // Graceful shutdown
-  const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT'];
-  signals.forEach((signal) => {
-    process.on(signal, async () => {
-      logger.log(`Received ${signal}, shutting down gracefully...`);
-      bot.stop(signal);
-      await app.close();
-      process.exit(0);
+  try {
+    const bot = app.get<Telegraf>(getBotToken());
+    await bot.launch({
+      dropPendingUpdates: true,
+      allowedUpdates: ['message', 'callback_query'],
     });
-  });
+
+    logger.log(`🚀 Application is running on: http://localhost:${port}`);
+    logger.log(`📍 Environment: ${nodeEnv}`);
+    logger.log(`🤖 Bot is ready and listening for updates!`);
+
+    // Graceful shutdown
+    const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT'];
+    signals.forEach((signal) => {
+      process.on(signal, async () => {
+        logger.log(`Received ${signal}, shutting down gracefully...`);
+        bot.stop(signal);
+        await app.close();
+        process.exit(0);
+      });
+    });
+  } catch (error) {
+    logger.error(`❌ Failed to launch bot: ${error.message}`);
+    logger.error(error.stack);
+  }
 }
 
 bootstrap().catch((error) => {
