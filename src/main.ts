@@ -58,9 +58,9 @@ async function bootstrap() {
         process.exit(0);
       });
     });
-  } catch (error) {
-    logger.error(`❌ Failed to launch bot: ${error.message}`);
-    logger.error(error.stack);
+  } catch (error: any) {
+    logger.error(`❌ Failed to launch bot: ${error?.message || error}`);
+    logger.error(error?.stack);
   }
 }
 
